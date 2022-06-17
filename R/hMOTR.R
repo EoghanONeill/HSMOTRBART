@@ -144,6 +144,7 @@ h_motr_bart = function(x,
       #This function creates the phi-matrix based on the standardized data, ancestors object, the phi-function and the bandwidth
       # phi_matrix = phi_matrix(curr_trees[[j]],int, X_stand)
 
+
       int_temp <- int
       if(!is.matrix(int_temp)){
         # print("int_temp = ")
@@ -170,7 +171,6 @@ h_motr_bart = function(x,
                           ncol = ncol(int_temp)) ,
                    as.matrix(X_stand))
       )
-
 
 
       #This function construct our design matrix based on the phi-matrix and the covariates that are included in the tree
@@ -232,7 +232,7 @@ h_motr_bart = function(x,
                             nrow = nrow(int_temp),
                             ncol = ncol(int_temp)) ,
                      as.matrix(X_stand))
-        )
+          )
 
 
         #This function construct our design matrix based on the phi-matrix and the covariates that are included in the tree
@@ -264,7 +264,7 @@ h_motr_bart = function(x,
       a = alpha_mh(l_new,l_old, curr_trees[[j]],new_trees[[j]], type)
 
 
-      if(min(1,a) > runif(1)) { # In case the alpha is bigger than a uniformly sampled value between zero and one
+      if(a > runif(1)) { # In case the alpha is bigger than a uniformly sampled value between zero and one
 
         curr_trees[[j]] = new_trees[[j]] # The current tree "becomes" the new tree, if the latter is better
 

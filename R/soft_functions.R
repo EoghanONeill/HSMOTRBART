@@ -198,7 +198,7 @@ conditional_tilde = function(tree, X, R, sigma2, V, inv_V, nu, lambda, tau_b, an
   #Note that we need to add the number of trees to our input
   #Note that not all input variables are required for the function, but to keep matters congruent we leave them
 
-  T = ntrees
+  # T = ntrees
   N = nrow(X)
   p = ncol(X)
 
@@ -206,7 +206,7 @@ conditional_tilde = function(tree, X, R, sigma2, V, inv_V, nu, lambda, tau_b, an
   r_node = R
 
   # Calculation of covariance matrix
-  Sigma = sigma2*diag(N) + (1/(T*tau_b)) * X_node%*%t(X_node)
+  Sigma = sigma2*diag(N) + (1/(ntrees*tau_b)) * X_node%*%t(X_node)
   # Sigma_inv = solve(sigma2*diag(N) + (1/(T*tau_b)) * X_node%*%t(X_node))
   temp_chol <- chol(Sigma)
   Sigma_inv = chol2inv(temp_chol)
@@ -216,6 +216,8 @@ conditional_tilde = function(tree, X, R, sigma2, V, inv_V, nu, lambda, tau_b, an
   # log_lik= (-N/2)*log(2*pi) + (-1/2)*log(det(Sigma)) + -(1/2)*t(R)%*%Sigma_inv%*%R
 
   log_lik= (-N/2)*log(2*pi) + (-1/2)*logdettemp + -(1/2)*t(R)%*%Sigma_inv%*%R
+
+  # log_lik= (-N/2)*log(2*pi) + (-1/2)*log(det(Sigma)) + -(1/2)*t(R)%*%Sigma_inv%*%R
 
   if(is.infinite(log_lik)){
     log_lik = -1e301
@@ -282,7 +284,6 @@ simulate_beta_tilde = function(tree, X, R, sigma2, inv_V, tau_b, nu, ancestors) 
   inv_V = diag(p)*inv_V
   X_node = X
   r_node = R
-  # Lambda_node = solve(t(X_node)%*%X_node + inv_V)
   Lambda_node = chol2inv(chol(t(X_node)%*%X_node + inv_V))
 
   # Generate betas
@@ -306,7 +307,7 @@ get_beta_hat = function(sim_beta){
 # The tau prior function calculates the prior probability for the bandwidth
 # This is relevant for the second Metropolis Hastings step, input; tau value and tau rate
 tau_prior= function(tau_value, tau_rate){
-  tau = pexp(tau_value,(1/tau_rate), lower.tail = FALSE)
+  tau = dexp(tau_value,tau_rate)
   return(tau)
 }
 
@@ -349,13 +350,10 @@ test_function = function(newdata,object){
   # Initiliaze matrices to store the predictions for each observation and iteration
   preds = matrix(NA, nrow = nrow(newdata),
                  ncol = n_its)
-  # confs = matrix(NA, nrow = nrow(newdata),
-  #                ncol = n_its)
 
   # Now loop through iterations and get predictions
   for(i in 1:n_its) {
     pred = numeric(nrow(newdata))
-    # conf = numeric(nrow(newdata))
 
     for(j in 1:ntrees){
 
@@ -390,28 +388,22 @@ test_function = function(newdata,object){
         )
 
 
-
         design = design_matrix(tree,newdata,phi_matrix,int)
 
         # calculate the model fit
         pred = pred + (design %*% beta)
-        # conf = conf + design %*% beta  + rnorm(1,0, sqrt(object$sigma2[[j]])) # add a sample for the normal distribution to obtain confidence intervals
       }
       else{
-
         pred = pred + rep(beta, nrow(newdata))
-        # conf = conf + rep(beta, nrow(newdata))  + rnorm(1,0, sqrt(object$sigma2[[j]]))
       }
 
     }
 
     # re-scale the predictions
     preds[,i] = object$y_mean + object$y_sd*pred
-    # confs[,i] = object$y_mean + object$y_sd*conf
 
   }
 
-  return(list(predictions = preds#, confidence = confs
-              ))
+  return(list(predictions = preds))
 
 }

@@ -88,7 +88,6 @@ simulate_beta = function(tree, X, R, sigma2, inv_V, tau_b, nu, ancestors) {
     # Lambda_node = solve(t(X_node)%*%X_node + invV)
     Lambda_node = chol2inv(chol(t(X_node)%*%X_node + invV))
 
-
     # Generate betas  -------------------------------------------------
     beta_hat = rmvnorm(1,
                        mean = Lambda_node%*%(t(X_node)%*%r_node),
