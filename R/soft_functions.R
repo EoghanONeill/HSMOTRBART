@@ -92,6 +92,62 @@ phi_matrix = function(mtree,int, x){
   return(phi_matrix)
 }
 
+
+
+
+# fill_tree_details
+
+# The parent list function lists all the parents corresponding to the internal/terminal node, input: tree, observation number
+parent_list_test = function(tree_matrix_test, index, node_indices_test){
+  terminal_index = as.numeric(node_indices_test[index])
+  parent = as.numeric(tree_matrix_test[terminal_index,'parent'])
+  parents = cbind(terminal_index,parent)
+  while(!is.na(parent)){
+    parent = as.numeric(tree_matrix_test[parent,'parent'])
+    parents = cbind(parents, parent)
+  }
+  return(parents)
+}
+
+# The phi matrix function constructs based on the hierarchical shrinkage method, input: tree, data and information about the internals
+phi_matrix_test = function(mtree,int, x){
+
+  details_test = fill_tree_details(mtree, x)
+  node_indices_test = details_test$node_indices
+  tree_matrix_test = details_test$tree_matrix
+  # tree_matrix_test = mtree$tree_matrix
+
+  # print("tree_matrix_test = ")
+  # print(tree_matrix_test)
+  #
+  # print("mtree = ")
+  # print(mtree)
+
+  n = nrow(x)
+  phi_matrix = NULL
+  if(!is.matrix(int)){
+    phi_matrix = matrix(NA,n,1)
+    for(i in 1:n){
+      phi_matrix[i,1] = ( int['n_right']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int['child_left']),1,0)) +
+                            int['n_left']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int['child_right']),1,0)) )/ sqrt(int['n_left']*int['n_right'])
+    }
+  }
+  else{
+    phi_matrix = matrix(NA,n,nrow(int))
+    for(j in 1:nrow(int)){
+      for(i in 1:n){
+
+        phi_matrix[i,j] = (int[j,'n_right']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int[j,'child_left']),1,0)) +
+                             int[j,'n_left']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int[j,'child_right']),1,0)) )/ sqrt(int[j,'n_left']*int[j,'n_right'])
+
+      }
+    }
+
+  }
+
+  return(phi_matrix)
+}
+
 # The variable list function lists the variables that correspond to the splitting of each internal node, input; tree, number of the internal
 variable_list = function(tree, internal){
   list_var = 1
@@ -365,27 +421,28 @@ test_function = function(newdata,object){
       if(!is.null(int)){
 
         # phi_matrix = phi_matrix(tree,int,newdata)
+        phi_matrix = phi_matrix_test(tree,int,newdata)
 
-        int_temp <- int
-        if(!is.matrix(int_temp)){
-          # print("int_temp = ")
-          # print(int_temp)
-
-          int_temp <- t(int_temp)
-        }
-
-
-        phi_matrix = suppressWarnings(phi_app_hs(matrix(as.numeric(tree$tree_matrix),
-                                                        nrow = nrow(tree$tree_matrix),
-                                                        ncol = ncol(tree$tree_matrix)) ,
-                                                 matrix(as.numeric(tree$node_indices),
-                                                        nrow = length(tree$node_indices),
-                                                        ncol = 1)  ,
-                                                 matrix(as.numeric(int_temp),
-                                                        nrow = nrow(int_temp),
-                                                        ncol = ncol(int_temp)) ,
-                                                 as.matrix(newdata))
-        )
+        # int_temp <- int
+        # if(!is.matrix(int_temp)){
+        #   # print("int_temp = ")
+        #   # print(int_temp)
+        #
+        #   int_temp <- t(int_temp)
+        # }
+        #
+        #
+        # phi_matrix = suppressWarnings(phi_app_hs(matrix(as.numeric(tree$tree_matrix),
+        #                                                 nrow = nrow(tree$tree_matrix),
+        #                                                 ncol = ncol(tree$tree_matrix)) ,
+        #                                          matrix(as.numeric(tree$node_indices),
+        #                                                 nrow = length(tree$node_indices),
+        #                                                 ncol = 1)  ,
+        #                                          matrix(as.numeric(int_temp),
+        #                                                 nrow = nrow(int_temp),
+        #                                                 ncol = ncol(int_temp)) ,
+        #                                          as.matrix(newdata))
+        # )
 
 
         design = design_matrix(tree,newdata,phi_matrix,int)
