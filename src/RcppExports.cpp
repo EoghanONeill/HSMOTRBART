@@ -25,9 +25,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// phi_app_hs_test
+arma::mat phi_app_hs_test(arma::mat treemat, arma::mat internalmat, arma::mat xmat);
+RcppExport SEXP _HSMOTRBART_phi_app_hs_test(SEXP treematSEXP, SEXP internalmatSEXP, SEXP xmatSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type treemat(treematSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type internalmat(internalmatSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type xmat(xmatSEXP);
+    rcpp_result_gen = Rcpp::wrap(phi_app_hs_test(treemat, internalmat, xmat));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_HSMOTRBART_phi_app_hs", (DL_FUNC) &_HSMOTRBART_phi_app_hs, 4},
+    {"_HSMOTRBART_phi_app_hs_test", (DL_FUNC) &_HSMOTRBART_phi_app_hs_test, 3},
     {NULL, NULL, 0}
 };
 

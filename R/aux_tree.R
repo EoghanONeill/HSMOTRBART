@@ -34,18 +34,43 @@ fill_tree_details = function(curr_tree, X) {
     split_var = as.numeric(tree_matrix[curr_parent,'split_variable'])
     split_val = as.numeric(tree_matrix[curr_parent, 'split_value'])
 
+    # print("split_var = ")
+    # print(split_var)
+    # print("split_val = ")
+    # print(split_val)
+
     # Find whether it's a left or right terminal node
     left_or_right = ifelse(tree_matrix[curr_parent,'child_left'] == i,
                            'left', 'right')
+
+    # print("curr_parent = ")
+    # print(curr_parent)
+    #
+    # print("tree_matrix[curr_parent,'child_left'] = ")
+    # print(tree_matrix[curr_parent,'child_left'])
+    #
+    # print("left_or_right = ")
+    # print(left_or_right)
+
     if(left_or_right == 'left') {
       # If left use less than condition
       new_tree_matrix[i,'node_size'] = sum(X[node_indices == curr_parent,split_var] < split_val)
       node_indices[node_indices == curr_parent][X[node_indices == curr_parent,split_var] < split_val] = i
+
     } else {
       # If right use greater than condition
       new_tree_matrix[i,'node_size'] = sum(X[node_indices == curr_parent,split_var] >= split_val)
       node_indices[node_indices == curr_parent][X[node_indices == curr_parent,split_var] >= split_val] = i
+
+
     }
+
+    # print("end iteration i = ")
+    # print(i )
+    #
+    # print("node_indices = ")
+    # print(node_indices )
+
   } # End of loop through table
 
   return(list(tree_matrix = new_tree_matrix,

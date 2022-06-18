@@ -5,3 +5,7 @@ phi_app_hs <- function(treemat, node_indices, internalmat, xmat) {
     .Call(`_HSMOTRBART_phi_app_hs`, treemat, node_indices, internalmat, xmat)
 }
 
+phi_app_hs_test <- function(treemat, internalmat, xmat) {
+    .Call(`_HSMOTRBART_phi_app_hs_test`, treemat, internalmat, xmat)
+}
+

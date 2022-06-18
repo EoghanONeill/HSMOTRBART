@@ -114,14 +114,16 @@ phi_matrix_test = function(mtree,int, x){
 
   details_test = fill_tree_details(mtree, x)
   node_indices_test = details_test$node_indices
-  tree_matrix_test = details_test$tree_matrix
-  # tree_matrix_test = mtree$tree_matrix
+  # tree_matrix_test = details_test$tree_matrix
+  tree_matrix_test = mtree$tree_matrix
 
   # print("tree_matrix_test = ")
   # print(tree_matrix_test)
   #
   # print("mtree = ")
   # print(mtree)
+  # print("node_indices_test = ")
+  # print(node_indices_test)
 
   n = nrow(x)
   phi_matrix = NULL
@@ -421,28 +423,28 @@ test_function = function(newdata,object){
       if(!is.null(int)){
 
         # phi_matrix = phi_matrix(tree,int,newdata)
-        phi_matrix = phi_matrix_test(tree,int,newdata)
+        # phi_matrix = phi_matrix_test(tree,int,newdata)
 
-        # int_temp <- int
-        # if(!is.matrix(int_temp)){
-        #   # print("int_temp = ")
-        #   # print(int_temp)
-        #
-        #   int_temp <- t(int_temp)
-        # }
-        #
-        #
-        # phi_matrix = suppressWarnings(phi_app_hs(matrix(as.numeric(tree$tree_matrix),
-        #                                                 nrow = nrow(tree$tree_matrix),
-        #                                                 ncol = ncol(tree$tree_matrix)) ,
-        #                                          matrix(as.numeric(tree$node_indices),
-        #                                                 nrow = length(tree$node_indices),
-        #                                                 ncol = 1)  ,
-        #                                          matrix(as.numeric(int_temp),
-        #                                                 nrow = nrow(int_temp),
-        #                                                 ncol = ncol(int_temp)) ,
-        #                                          as.matrix(newdata))
-        # )
+        int_temp <- int
+        if(!is.matrix(int_temp)){
+          # print("int_temp = ")
+          # print(int_temp)
+
+          int_temp <- t(int_temp)
+        }
+
+
+        phi_matrix = suppressWarnings(phi_app_hs_test(matrix(as.numeric(tree$tree_matrix),
+                                                        nrow = nrow(tree$tree_matrix),
+                                                        ncol = ncol(tree$tree_matrix)) ,
+                                                 # matrix(as.numeric(tree$node_indices),
+                                                 #        nrow = length(tree$node_indices),
+                                                 #        ncol = 1)  ,
+                                                 matrix(as.numeric(int_temp),
+                                                        nrow = nrow(int_temp),
+                                                        ncol = ncol(int_temp)) ,
+                                                 as.matrix(newdata))
+        )
 
 
         design = design_matrix(tree,newdata,phi_matrix,int)
