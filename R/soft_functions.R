@@ -419,6 +419,9 @@ test_function = function(newdata,object){
       tree = object$trees[[i]][[j]]
       beta = object$beta_trees[[i]][[j]]
       int = get_internals(tree)
+
+      # tree$node_indices = fill_tree_details(tree,newdata)$node_indices
+
       # get the branching information and bandwidth of the trained trees and apply to the test data
       if(!is.null(int)){
 
@@ -445,6 +448,21 @@ test_function = function(newdata,object){
                                                         ncol = ncol(int_temp)) ,
                                                  as.matrix(newdata))
         )
+
+
+        # phi_matrix = suppressWarnings(phi_app_hs(matrix(as.numeric(tree$tree_matrix),
+        #                                                      nrow = nrow(tree$tree_matrix),
+        #                                                      ncol = ncol(tree$tree_matrix)) ,
+        #                                          tree$node_indices,
+        #                                               # matrix(as.numeric(tree$node_indices),
+        #                                               #        nrow = length(tree$node_indices),
+        #                                               #        ncol = 1)  ,
+        #                                               matrix(as.numeric(int_temp),
+        #                                                      nrow = nrow(int_temp),
+        #                                                      ncol = ncol(int_temp)) ,
+        #                                               as.matrix(newdata))
+        # )
+
 
 
         design = design_matrix(tree,newdata,phi_matrix,int)
