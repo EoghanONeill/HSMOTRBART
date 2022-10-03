@@ -74,7 +74,8 @@ phi_matrix = function(mtree,int, x){
   if(!is.matrix(int)){
     phi_matrix = matrix(NA,n,1)
     for(i in 1:n){
-      phi_matrix[i,1] = ( int['n_right']*sum(ifelse(is.element(parent_list(mtree,i),int['child_left']),1,0)) + int['n_left']*sum(ifelse(is.element(parent_list(mtree,i),int['child_right']),1,0)) )/ sqrt(int['n_left']*int['n_right'])
+      phi_matrix[i,1] = ( int['n_right']*sum(ifelse(is.element(parent_list(mtree,i),int['child_left']),1,0)) -
+                            int['n_left']*sum(ifelse(is.element(parent_list(mtree,i),int['child_right']),1,0)) )/ sqrt(int['n_left']*int['n_right'])
     }
   }
   else{
@@ -82,7 +83,8 @@ phi_matrix = function(mtree,int, x){
     for(j in 1:nrow(int)){
       for(i in 1:n){
 
-        phi_matrix[i,j] = (int[j,'n_right']*sum(ifelse(is.element(parent_list(mtree,i),int[j,'child_left']),1,0)) + int[j,'n_left']*sum(ifelse(is.element(parent_list(mtree,i),int[j,'child_right']),1,0)) )/ sqrt(int[j,'n_left']*int[j,'n_right'])
+        phi_matrix[i,j] = (int[j,'n_right']*sum(ifelse(is.element(parent_list(mtree,i),int[j,'child_left']),1,0)) -
+                             int[j,'n_left']*sum(ifelse(is.element(parent_list(mtree,i),int[j,'child_right']),1,0)) )/ sqrt(int[j,'n_left']*int[j,'n_right'])
 
       }
     }
@@ -130,7 +132,7 @@ phi_matrix_test = function(mtree,int, x){
   if(!is.matrix(int)){
     phi_matrix = matrix(NA,n,1)
     for(i in 1:n){
-      phi_matrix[i,1] = ( int['n_right']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int['child_left']),1,0)) +
+      phi_matrix[i,1] = ( int['n_right']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int['child_left']),1,0)) -
                             int['n_left']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int['child_right']),1,0)) )/ sqrt(int['n_left']*int['n_right'])
     }
   }
@@ -139,7 +141,7 @@ phi_matrix_test = function(mtree,int, x){
     for(j in 1:nrow(int)){
       for(i in 1:n){
 
-        phi_matrix[i,j] = (int[j,'n_right']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int[j,'child_left']),1,0)) +
+        phi_matrix[i,j] = (int[j,'n_right']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int[j,'child_left']),1,0)) -
                              int[j,'n_left']*sum(ifelse(is.element(parent_list_test(tree_matrix_test,i, node_indices_test),int[j,'child_right']),1,0)) )/ sqrt(int[j,'n_left']*int[j,'n_right'])
 
       }

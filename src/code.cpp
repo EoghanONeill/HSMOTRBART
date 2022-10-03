@@ -91,7 +91,7 @@ arma::mat phi_app_hs( arma::mat treemat,
 
           // Rcpp::Rcout << "Line 92, i = " <<  i << " .\n " ;
 
-          phi_matrix(i,j) = (n_right*numeqleft + n_left*numeqright )/temp_denom;
+          phi_matrix(i,j) = (n_right*numeqleft - n_left*numeqright )/temp_denom;
           break;
 
         }else{
@@ -109,7 +109,7 @@ arma::mat phi_app_hs( arma::mat treemat,
 
           // Rcpp::Rcout << "Line 110, i = " <<  i << " .\n " ;
 
-          phi_matrix(i,j) = (n_right*numeqleft + n_left*numeqright )/temp_denom;
+          phi_matrix(i,j) = (n_right*numeqleft - n_left*numeqright )/temp_denom;
 
         }
         // double parent_d = parent;
@@ -328,7 +328,7 @@ arma::mat phi_app_hs_test( arma::mat treemat,// arma::vec node_indices1,
 
           // Rcpp::Rcout << "Line 92, i = " <<  i << " .\n " ;
 
-          phi_matrix(i,j) = (n_right*numeqleft + n_left*numeqright )/temp_denom;
+          phi_matrix(i,j) = (n_right*numeqleft - n_left*numeqright )/temp_denom;
           break;
 
         }else{
@@ -346,7 +346,7 @@ arma::mat phi_app_hs_test( arma::mat treemat,// arma::vec node_indices1,
 
           // Rcpp::Rcout << "Line 110, i = " <<  i << " .\n " ;
 
-          phi_matrix(i,j) = (n_right*numeqleft + n_left*numeqright )/temp_denom;
+          phi_matrix(i,j) = (n_right*numeqleft - n_left*numeqright )/temp_denom;
 
         }
         // double parent_d = parent;
