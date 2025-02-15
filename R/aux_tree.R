@@ -193,9 +193,62 @@ get_ancestors = function(tree){
   return(save_ancestor)
 }
 
-update_s = function(var_count, p, alpha_s){
-  s_ = rdirichlet(1, alpha_s/p + var_count)
-  return(s_)
+# update_s = function(var_count, p, alpha_s){
+#   s_ = rdirichlet(1, alpha_s/p + var_count)
+#   return(s_)
+# }
+
+update_s <- function(var_count, p, alpha_s) {
+  # s_ = rdirichlet(1, as.vector((alpha_s / p ) + var_count))
+
+  # // Get shape vector
+  # shape_up = alpha_s / p
+  shape_up = as.vector((alpha_s / p ) + var_count)
+
+  # // Sample unnormalized s on the log scale
+  templogs = rep(NA, p)
+  for(i in 1:p) {
+    templogs[i] = SoftBart:::rlgam(shape = shape_up[i])
+  }
+
+  if(any(templogs== -Inf)){
+    print("alpha_s = ")
+    print(alpha_s)
+    print("var_count = ")
+    print(var_count)
+    print("templogs = ")
+    print(templogs)
+    stop('templogs == -Inf')
+  }
+
+  # // Normalize s on the log scale, then exponentiate
+  # templogs = templogs - log_sum_exp(hypers.logs);
+  max_log = max(templogs)
+  templogs2 = templogs - (max_log + log(sum(exp( templogs  -  max_log ))))
+
+
+  s_ = exp(templogs2)
+
+  # if(any(s_==0)){
+  #   print("templogs2 = ")
+  #   print(templogs2)
+  #   print("templogs = ")
+  #   print(templogs)
+  #   print("alpha_s = ")
+  #   print(alpha_s)
+  #   print("var_count = ")
+  #   print(var_count)
+  #   print("s_ = ")
+  #   print(s_)
+  #   stop('s_ == 0')
+  # }
+
+  ret_list <- list()
+  ret_list[[1]] <- s_
+  ret_list[[2]] <- mean(templogs2)
+
+
+  return(ret_list)
 }
 
 update_vars_intercepts_slopes <- function(trees, n_tress, sigma2, a0 = 1, b0 = 1, a1 = 1, b1 = 1){

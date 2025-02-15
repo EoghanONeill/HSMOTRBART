@@ -37,18 +37,34 @@ tree_full_conditional = function(tree, X, R, sigma2, V, inv_V, nu, lambda, tau_b
     }
     p = length(lm_vars)
     invV = diag(c(inv_V[1], rep(inv_V[2], p - 1)), ncol = p)
-    V_ = diag(c(V[1], rep(V[2], p - 1)), ncol=p)
-    # invV = diag(p)*inv_V
-    X_node = X[curr_X_node_indices == unique_node_indices[i], lm_vars]
-    r_node = R[curr_X_node_indices == unique_node_indices[i]]
-    Lambda_node_inv = t(X_node)%*%X_node + invV
-    # Lambda_node = solve(t(X_node)%*%X_node + invV)
-    # mu_node = Lambda_node%*%((t(X_node))%*%r_node)
-    mu_node = solve(Lambda_node_inv, t(X_node)%*%r_node)
+    # V_ = diag(c(V[1], rep(V[2], p - 1)), ncol=p)
+    # # invV = diag(p)*inv_V
+    # X_node = X[curr_X_node_indices == unique_node_indices[i], lm_vars]
+    # r_node = R[curr_X_node_indices == unique_node_indices[i]]
+    # Lambda_node_inv = t(X_node)%*%X_node + invV
+    # # Lambda_node = solve(t(X_node)%*%X_node + invV)
+    # # mu_node = Lambda_node%*%((t(X_node))%*%r_node)
+    # mu_node = solve(Lambda_node_inv, t(X_node)%*%r_node)
+    #
+    # log_post[i] = -0.5 * log(det(V_)) +
+    #   0.5*log(1/det(Lambda_node_inv)) -
+    #   (1/(2*sigma2)) * (- t(mu_node)%*%Lambda_node_inv%*%mu_node)
 
-    log_post[i] = -0.5 * log(det(V_)) +
-      0.5*log(1/det(Lambda_node_inv)) -
-      (1/(2*sigma2)) * (- t(mu_node)%*%Lambda_node_inv%*%mu_node)
+
+    U = chol ( crossprod ( X_node )+ invV )
+    IR = backsolve (U , diag ( p ))
+    # btilde = crossprod ( t ( IR ))%*%( crossprod (X_node , r_node ) )
+    # beta_hat = btilde + sqrt ( sigma2 )* IR %*% rnorm ( p )
+    # tmulambinvmu = crossprod ( t ( IR )%*%( crossprod (X_node , r_node ) ) )
+    tmulambinvmu = crossprod ( crossprod ( IR , crossprod (X_node , r_node ) ) )
+
+    # log_post[i] = -0.5 * (V[1] + (p-1)*V[2]  ) -  sum(diag(U)) - #determinant is 2 times det of Choleskey
+    #   (1/(2*sigma2)) * (- tmulambinvmu)
+
+    log_post[i] = -0.5 * log(V[1])*p   -  sum(log(diag(U))) - # log determinant is 2 times log det of Choleskey
+      (1/(2*sigma2)) * (- tmulambinvmu)
+
+
 
   }
   return(sum(log_post))
@@ -86,12 +102,22 @@ simulate_beta = function(tree, X, R, sigma2, inv_V, tau_b, nu, ancestors) {
     X_node = X[curr_X_node_indices == unique_node_indices[i], lm_vars] # Only variables that have been used as split
     r_node = R[curr_X_node_indices == unique_node_indices[i]]
     # Lambda_node = solve(t(X_node)%*%X_node + invV)
-    Lambda_node = chol2inv(chol(t(X_node)%*%X_node + invV))
 
-    # Generate betas  -------------------------------------------------
-    beta_hat = rmvnorm(1,
-                       mean = Lambda_node%*%(t(X_node)%*%r_node),
-                       sigma = sigma2*Lambda_node)
+    # Lambda_node = chol2inv(chol(t(X_node)%*%X_node + invV))
+    #
+    # # Generate betas  -------------------------------------------------
+    # beta_hat = rmvnorm(1,
+    #                    mean = Lambda_node%*%(t(X_node)%*%r_node),
+    #                    sigma = sigma2*Lambda_node)
+
+
+    U = chol ( crossprod ( X_node )+ invV )
+    IR = backsolve (U , diag ( p ))
+    # btilde = crossprod ( t ( IR ))%*%( crossprod (X_node , r_node ) )
+    btilde = tcrossprod (  IR , crossprod( crossprod (X_node , r_node ), IR ))
+
+    beta_hat = btilde + sqrt ( sigma2 )* IR %*% rnorm ( p )
+
 
     # Put in just the ones that are useful
     tree$tree_matrix[unique_node_indices[i],'beta_hat'] = paste(beta_hat, collapse = ',')

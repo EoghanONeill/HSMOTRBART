@@ -344,12 +344,23 @@ simulate_beta_tilde = function(tree, X, R, sigma2, inv_V, tau_b, nu, ancestors) 
   inv_V = diag(p)*inv_V
   X_node = X
   r_node = R
-  Lambda_node = chol2inv(chol(t(X_node)%*%X_node + inv_V))
 
-  # Generate betas
-  beta_hat = rmvnorm(1,
-                     mean = Lambda_node%*%(t(X_node)%*%r_node),
-                     sigma = sigma2*Lambda_node)
+  # Lambda_node = chol2inv(chol(t(X_node)%*%X_node + inv_V))
+  #
+  # # Generate betas
+  # beta_hat = rmvnorm(1,
+  #                    mean = Lambda_node%*%(t(X_node)%*%r_node),
+  #                    sigma = sigma2*Lambda_node)
+
+  U = chol ( crossprod ( X_node )+ inv_V )
+  IR = backsolve (U , diag ( p ))
+  # btilde = crossprod ( t ( IR ))%*%( crossprod (X_node , r_node ) )
+  # btilde = crossprod ( t ( IR ))%*%( crossprod (X_node , r_node ) )
+
+  btilde = tcrossprod (  IR , crossprod( crossprod (X_node , r_node ), IR ))
+
+  beta_hat = btilde + sqrt ( sigma2 )* IR %*% rnorm ( p )
+
 
   # Add the beta hat results to the tree matrix
   tree$tree_matrix[,'beta_hat'] = paste(beta_hat, collapse = ',')
