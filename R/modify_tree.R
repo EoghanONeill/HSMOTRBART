@@ -156,7 +156,7 @@ grow_tree = function(X, y, curr_tree, node_min_size, s) {
     new_tree$var = split_variable
 
     # Check for bad tree
-    if(any(as.numeric(new_tree$tree_matrix[,'node_size']) <= node_min_size)) {
+    if(any(as.numeric(new_tree$tree_matrix[,'node_size']) < node_min_size)) {
       count_bad_trees = count_bad_trees + 1
     } else {
       bad_trees = FALSE
@@ -319,7 +319,7 @@ change_tree = function(X, y, curr_tree, node_min_size) {
       # new_split_value = sample(available_values[-c(1,length(available_values))], 1)
       # new_split_value = resample(available_values[-c(1,length(available_values))])
       new_split_value = runif(1,available_values[2],available_values[length(available_values)-1])
-      
+
     }
     # Update the tree details
     new_tree$tree_matrix[node_to_change,
@@ -334,7 +334,7 @@ change_tree = function(X, y, curr_tree, node_min_size) {
     new_tree$var = c(var_changed_node, new_split_variable)
 
     # Check for bad tree
-    if(any(as.numeric(new_tree$tree_matrix[terminal_nodes, 'node_size']) <= node_min_size)) {
+    if(any(as.numeric(new_tree$tree_matrix[terminal_nodes, 'node_size']) < node_min_size)) {
       count_bad_trees = count_bad_trees + 1
     } else {
       bad_trees = FALSE
@@ -404,7 +404,7 @@ swap_tree = function(X, y, curr_tree, node_min_size) {
     new_tree = fill_tree_details(new_tree, X)
 
     # Check for bad tree
-    if(any(as.numeric(new_tree$tree_matrix[terminal_nodes, 'node_size']) <= node_min_size)) {
+    if(any(as.numeric(new_tree$tree_matrix[terminal_nodes, 'node_size']) < node_min_size)) {
       count_bad_trees = count_bad_trees + 1
     } else {
       bad_trees = FALSE
