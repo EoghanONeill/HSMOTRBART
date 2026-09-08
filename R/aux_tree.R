@@ -97,7 +97,8 @@ get_predictions = function(trees, X, single_tree = FALSE, ancestors) {
     } else {
       # Loop through the node indices to get predictions
       predictions = rep(NA, nrow(X))
-      unique_node_indices = unique(trees$node_indices)
+      # unique_node_indices = unique(trees$node_indices)
+      terminal_rows <- which(trees$tree_matrix[, "terminal"] == 1      )
       # Get the node indices for the current X matrix
       curr_X_node_indices = fill_tree_details(trees, X)$node_indices
       which_internal = which(trees$tree_matrix[,'terminal'] == 0)
@@ -110,13 +111,13 @@ get_predictions = function(trees, X, single_tree = FALSE, ancestors) {
       n = nrow(X)
 
       # Now loop through all node indices to fill in details
-      for(i in 1:length(unique_node_indices)) {
+      for(i in 1:length(terminal_rows)) {
         if (ancestors == TRUE) {
-          lm_vars = c(1, get_ancs[which(get_ancs[,'terminal'] == unique_node_indices[i]), 'ancestor']) # Get the corresponding ancestors of the current terminal node
+          lm_vars = c(1, get_ancs[which(get_ancs[,'terminal'] == terminal_rows[i]), 'ancestor']) # Get the corresponding ancestors of the current terminal node
         }
-        X_node = matrix(X[,lm_vars], nrow=n)[curr_X_node_indices == unique_node_indices[i],]
-        beta_hat = as.numeric(unlist(strsplit(trees$tree_matrix[unique_node_indices[i], 'beta_hat'],",")))
-        predictions[curr_X_node_indices == unique_node_indices[i]] = X_node%*%beta_hat
+        X_node = matrix(X[,lm_vars], nrow=n)[curr_X_node_indices == terminal_rows[i],]
+        beta_hat = as.numeric(unlist(strsplit(trees$tree_matrix[terminal_rows[i], 'beta_hat'],",")))
+        predictions[curr_X_node_indices == terminal_rows[i]] = X_node%*%beta_hat
       }
     }
     # More here to deal with more complicated trees - i.e. multiple trees
